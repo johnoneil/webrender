@@ -1,7 +1,5 @@
-# Ensure that the clip rect of a primitive that is promoted to a compositor
-# surface is correctly applied when registering it as an occlusion plane.
-
 root:
+  backdrop-root: true
   items:
     - type: image
       src: color.bars.png
@@ -9,6 +7,8 @@ root:
       # so the following tag will behave correctly
       alpha-type: alpha
       bounds: [50, 50, 200, 200]
+      items:
+
 
     - type: image
       src: premult.alpha.color.bars.png
@@ -16,3 +16,24 @@ root:
       # so the following tag will behave correctly
       alpha-type: premultiplied-alpha
       bounds: [300, 50, 200, 200]
+
+    - type: stacking-context
+      #backdrop-root: true
+      bounds: 0 0 0 0
+      #items:
+      # - type: rect
+      #   color: [255, 0, 0, 1.0]
+      #   bounds: 100 100 100 100
+      # - type: clip
+      #   id: 2
+      #   bounds: 100 100 100 100
+      #   clip-rect: 100 100 100 100
+      #- type: stacking-context
+      #  bounds: 0 0 500 500
+      items:
+      - type: backdrop-filter
+        bounds: 25 75 500 100
+        clip-node: 2
+        #filters: invert(1)
+        filters: blur(10, 10)
+
