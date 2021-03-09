@@ -296,25 +296,26 @@ fn generate_solid_color_image(
 
 
 fn is_image_opaque(format: ImageFormat, bytes: &[u8]) -> bool {
-    match format {
-        ImageFormat::BGRA8 |
-        ImageFormat::RGBA8 => {
-            let mut is_opaque = true;
-            for i in 0 .. (bytes.len() / 4) {
-                if bytes[i * 4 + 3] != 255 {
-                    is_opaque = false;
-                    break;
-                }
-            }
-            is_opaque
-        }
-        ImageFormat::RG8 => true,
-        ImageFormat::RG16 => true,
-        ImageFormat::R8 => false,
-        ImageFormat::R16 => false,
-        ImageFormat::RGBAF32 |
-        ImageFormat::RGBAI32 => unreachable!(),
-    }
+    // match format {
+    //     ImageFormat::BGRA8 |
+    //     ImageFormat::RGBA8 => {
+    //         let mut is_opaque = true;
+    //         for i in 0 .. (bytes.len() / 4) {
+    //             if bytes[i * 4 + 3] != 255 {
+    //                 is_opaque = false;
+    //                 break;
+    //             }
+    //         }
+    //         is_opaque
+    //     }
+    //     ImageFormat::RG8 => true,
+    //     ImageFormat::RG16 => true,
+    //     ImageFormat::R8 => false,
+    //     ImageFormat::R16 => false,
+    //     ImageFormat::RGBAF32 |
+    //     ImageFormat::RGBAI32 => unreachable!(),
+    // }
+    true
 }
 
 pub struct YamlFrameReader {
