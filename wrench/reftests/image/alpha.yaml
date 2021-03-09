@@ -1,0 +1,14 @@
+# Ensure that the clip rect of a primitive that is promoted to a compositor
+# surface is correctly applied when registering it as an occlusion plane.
+
+root:
+  items:
+    - type: image
+      src: color.bars.png
+      alpha-type: alpha
+      bounds: [50, 50, 200, 200]
+
+    - type: image
+      src: premult.alpha.color.bars.png
+      alpha-type: premultiplied-alpha
+      bounds: [300, 50, 200, 200]
