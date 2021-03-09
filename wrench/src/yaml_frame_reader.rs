@@ -646,7 +646,7 @@ impl YamlFrameReader {
                     }
                     image::DynamicImage::ImageRgba8(_) => {
                         let mut pixels = image.to_bytes();
-                        premultiply(pixels.as_mut_slice());
+                        //premultiply(pixels.as_mut_slice());
                         (ImageFormat::BGRA8, pixels)
                     }
                     image::DynamicImage::ImageRgb8(_) => {
