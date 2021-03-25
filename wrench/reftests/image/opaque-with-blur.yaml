@@ -1,21 +1,30 @@
 root:
   backdrop-root: true
   items:
-    - type: image
-      src: color.bars.png
-      opaque: true
-      bounds: [50, 50, 200, 200]
-
-    - type: image
-      src: premult.alpha.color.bars.png
-      opaque: true
-      bounds: [300, 50, 200, 200]
-
-    - type: stacking-context
-      bounds: 0 0 0 0
+    - type: clip
+      bounds: [25, 50, 550, 200]
+      id: 2
       items:
-      - type: backdrop-filter
-        bounds: 25 75 500 100
-        clip-node: 2
-        filters: blur(10, 10)
+        - type: image
+          #src: color.bars.png
+          src: premult.alpha.color.bars.png
+          opaque: true
+          bounds: [50, 50, 200, 200]
+
+        # - type: image
+        #   src: premult.alpha.color.bars.png
+        #   opaque: true
+        #   bounds: [325, 50, 200, 200]
+
+    - clip-node: 2
+      type: "stacking-context"
+      filters: [identity]
+      items:
+        - type: backdrop-filter
+          bounds: 25 75 250 100
+          filters: blur(5, 5)
+        - bounds: 25 75 250 100
+          type: rect
+          color: 255 0 0 0.25
+
 
