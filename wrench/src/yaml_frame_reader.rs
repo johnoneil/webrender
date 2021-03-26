@@ -1756,6 +1756,13 @@ impl YamlFrameReader {
                     flags.remove(PrimitiveFlags::PREFER_COMPOSITOR_SURFACE);
                 }
             }
+            if let Some(force_opaque) = item["force-opacity"].as_bool() {
+                if force_opaque {
+                    flags.insert(PrimitiveFlags::FORCE_OPACITY);
+                } else {
+                    flags.remove(PrimitiveFlags::FORCE_OPACITY);
+                }
+            }
 
             let mut info = CommonItemProperties {
                 clip_rect,

@@ -1,29 +1,36 @@
 root:
   backdrop-root: true
+  bounds: 0 0 768 768
   items:
-    - type: clip
+    - type: stacking-context
       bounds: [25, 50, 550, 200]
       id: 2
       items:
         - type: image
-          #src: color.bars.png
-          src: premult.alpha.color.bars.png
+          alpha-type: alpha
+          src: color.bars.png
+          #composite: atop
+          # alpha-type: premultiplied-alpha
+          # src: premult.alpha.color.bars.png
           opaque: true
           bounds: [50, 50, 200, 200]
 
         # - type: image
-        #   src: premult.alpha.color.bars.png
+        #   alpha-type: alpha
+        #   src: color.bars.png
+        #   # alpha-type: premultiplied-alpha
+        #   # src: premult.alpha.color.bars.png
         #   opaque: true
-        #   bounds: [325, 50, 200, 200]
+        #   bounds: [525, 50, 200, 200]
 
-    - clip-node: 2
-      type: "stacking-context"
+    - type: "stacking-context"
       filters: [identity]
       items:
         - type: backdrop-filter
-          bounds: 25 75 250 100
+          "force-opacity" : true
+          bounds: 25 75 550 100
           filters: blur(5, 5)
-        - bounds: 25 75 250 100
+        - bounds: 25 75 550 100
           type: rect
           color: 255 0 0 0.25
 

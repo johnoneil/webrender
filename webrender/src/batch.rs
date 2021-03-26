@@ -1463,12 +1463,12 @@ impl BatchBuilder {
             }
             PrimitiveInstanceKind::Picture { pic_index, segment_instance_index, .. } => {
                 let picture = &ctx.prim_store.pictures[pic_index.0];
-                // JONEIL:we can alleviate the issue with background blurs causing composition via
-                // premultiplied alpha by forcing no blend mode here. This batches this picture
-                // into the non-alpha list, exercising the code paths we typically do (wich work properly).
-                // TODO: We could drive this as a swtich off some Picture property.
-                //let non_segmented_blend_mode = BlendMode::PremultipliedAlpha;
-                let non_segmented_blend_mode = BlendMode::None;
+                // JONEIL: We can alleviate issues with losing image opacity
+                // by using the non-allpha (BlendMode::None) pass.
+                let non_segmented_blend_mode = match picture.is_opaque {
+                    true => BlendMode::None,
+                    false => BlendMode::PremultipliedAlpha,
+                };
                 let prim_cache_address = gpu_cache.get_address(&ctx.globals.default_image_handle);
 
                 let prim_header = PrimitiveHeader {
