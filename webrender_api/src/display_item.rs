@@ -47,6 +47,9 @@ bitflags! {
         /// compositor surface under certain (implementation specific) conditions. This
         /// is typically used for large videos, and canvas elements.
         const PREFER_COMPOSITOR_SURFACE = 1 << 3;
+
+        // JONEIL: Force opacity on background blur filter effects.
+        const FORCE_OPACITY = 1 << 5;
     }
 }
 

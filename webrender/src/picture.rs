@@ -4558,6 +4558,8 @@ pub struct PicturePrimitive {
     /// Keep track of the number of render tasks dependencies to pre-allocate
     /// the dependency array next frame.
     num_render_tasks: usize,
+
+    pub is_opaque: bool,
 }
 
 impl PicturePrimitive {
@@ -4704,6 +4706,7 @@ impl PicturePrimitive {
             options,
             segments_are_valid: false,
             num_render_tasks: 0,
+            is_opaque: flags.contains(PrimitiveFlags::FORCE_OPACITY),
         }
     }
 

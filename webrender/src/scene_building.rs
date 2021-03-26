@@ -3201,7 +3201,7 @@ impl<'a> SceneBuilder<'a> {
         filter_datas: Vec<FilterData>,
         filter_primitives: Vec<FilterPrimitive>,
     ) {
-        let mut backdrop_pic_index = match self.cut_backdrop_picture() {
+        let mut backdrop_pic_index = match self.cut_backdrop_picture(info) {
             // Backdrop contains no content, so no need to add backdrop-filter
             None => return,
             Some(backdrop_pic_index) => backdrop_pic_index,
@@ -3323,12 +3323,15 @@ impl<'a> SceneBuilder<'a> {
             );
     }
 
-    pub fn cut_backdrop_picture(&mut self) -> Option<PictureIndex> {
+    pub fn cut_backdrop_picture(&mut self, info: &LayoutPrimitiveInfo) -> Option<PictureIndex> {
         let mut flattened_items = None;
         let mut backdrop_root =  None;
         let mut spatial_node_index = SpatialNodeIndex::INVALID;
         let mut prim_flags = PrimitiveFlags::default();
         for sc in self.sc_stack.iter_mut().rev() {
+            if info.flags.contains(PrimitiveFlags::FORCE_OPACITY) {
+                sc.prim_flags.set(PrimitiveFlags::FORCE_OPACITY, true);
+            }
             // Add child contents to parent stacking context
             if let Some((_, flattened_instance)) = flattened_items.take() {
                 sc.prim_list.add_prim(
