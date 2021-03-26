@@ -52,6 +52,8 @@ bitflags! {
         /// ExternalImageId, and the compositor will use the native image directly.
         /// Used as a further extension on top of PREFER_COMPOSITOR_SURFACE.
         const SUPPORTS_EXTERNAL_COMPOSITOR_SURFACE = 1 << 4;
+        // JONEIL: Force opacity on background blur filter effects.
+        const FORCE_OPACITY = 1 << 5;
     }
 }
 

@@ -1,0 +1,13 @@
+root:
+  items:
+    - type: image
+      src: color.bars.png
+      opaque: true
+      #alpha-type: alpha
+      bounds: [50, 50, 200, 200]
+
+    - type: image
+      src: premult.alpha.color.bars.png
+      opaque: true
+      #alpha-type: premultiplied-alpha
+      bounds: [300, 50, 200, 200]

@@ -1,0 +1,23 @@
+root:
+  backdrop-root: true
+  items:
+    - type: image
+      src: color.bars.png
+      alpha-type: alpha
+      bounds: [50, 50, 200, 200]
+      items:
+
+
+    - type: image
+      src: premult.alpha.color.bars.png
+      alpha-type: premultiplied-alpha
+      bounds: [300, 50, 200, 200]
+
+    - type: stacking-context
+      bounds: 0 0 0 0
+      items:
+      - type: backdrop-filter
+        bounds: 25 75 500 100
+        clip-node: 2
+        filters: blur(10, 10)
+

@@ -630,6 +630,7 @@ impl YamlFrameReader {
         tiling: Option<i64>,
         item: &Yaml,
         wrench: &mut Wrench,
+        is_opaque: Option<bool>,
     ) -> (ImageKey, LayoutSize) {
         let key = (file.to_owned(), tiling);
         if let Some(k) = self.image_map.get(&key) {
@@ -646,7 +647,7 @@ impl YamlFrameReader {
                     }
                     image::DynamicImage::ImageRgba8(_) => {
                         let mut pixels = image.to_bytes();
-                        premultiply(pixels.as_mut_slice());
+                        //premultiply(pixels.as_mut_slice());
                         (ImageFormat::BGRA8, pixels)
                     }
                     image::DynamicImage::ImageRgb8(_) => {
@@ -665,8 +666,17 @@ impl YamlFrameReader {
                     _ => panic!("We don't support whatever your crazy image type is, come on"),
                 };
                 let mut flags = ImageDescriptorFlags::empty();
-                if is_image_opaque(format, &bytes[..]) {
-                    flags |= ImageDescriptorFlags::IS_OPAQUE;
+                match is_opaque {
+                    Some(is_opaque) => {
+                        if is_opaque {
+                            flags |= ImageDescriptorFlags::IS_OPAQUE;
+                        }
+                    },
+                    None => {
+                        if is_image_opaque(format, &bytes[..]) {
+                            flags |= ImageDescriptorFlags::IS_OPAQUE;
+                        }
+                    },
                 }
                 if self.allow_mipmaps {
                     flags |= ImageDescriptorFlags::ALLOW_MIPMAPS;
@@ -859,7 +869,7 @@ impl YamlFrameReader {
                 } else {
                     let mut file = self.aux_dir.clone();
                     file.push(filename);
-                    self.add_or_get_image(&file, tiling, item, wrench)
+                    self.add_or_get_image(&file, tiling, item, wrench, None)
                 }
             }
             None => {
@@ -1270,8 +1280,9 @@ impl YamlFrameReader {
                     let source = match border_type {
                         "image" => {
                             let file = rsrc_path(&item["image-source"], &self.aux_dir);
+                            let is_opaque = item["opaque"].as_bool();
                             let (image_key, _) = self
-                                .add_or_get_image(&file, None, item, wrench);
+                                .add_or_get_image(&file, None, item, wrench, is_opaque);
                             NinePatchBorderSource::Image(image_key)
                         }
                         "gradient" => {
@@ -1371,32 +1382,33 @@ impl YamlFrameReader {
         let color_depth = ColorDepth::Color8;
         let color_space = YuvColorSpace::Rec709;
         let color_range = ColorRange::Limited;
+        let opaque = item["opaque"].as_bool();
 
         let yuv_data = match item["format"].as_str().expect("no format supplied") {
             "planar" => {
                 let y_path = rsrc_path(&item["src-y"], &self.aux_dir);
-                let (y_key, _) = self.add_or_get_image(&y_path, None, item, wrench);
+                let (y_key, _) = self.add_or_get_image(&y_path, None, item, wrench, opaque);
 
                 let u_path = rsrc_path(&item["src-u"], &self.aux_dir);
-                let (u_key, _) = self.add_or_get_image(&u_path, None, item, wrench);
+                let (u_key, _) = self.add_or_get_image(&u_path, None, item, wrench, opaque);
 
                 let v_path = rsrc_path(&item["src-v"], &self.aux_dir);
-                let (v_key, _) = self.add_or_get_image(&v_path, None, item, wrench);
+                let (v_key, _) = self.add_or_get_image(&v_path, None, item, wrench, opaque);
 
                 YuvData::PlanarYCbCr(y_key, u_key, v_key)
             }
             "nv12" => {
                 let y_path = rsrc_path(&item["src-y"], &self.aux_dir);
-                let (y_key, _) = self.add_or_get_image(&y_path, None, item, wrench);
+                let (y_key, _) = self.add_or_get_image(&y_path, None, item, wrench, opaque);
 
                 let uv_path = rsrc_path(&item["src-uv"], &self.aux_dir);
-                let (uv_key, _) = self.add_or_get_image(&uv_path, None, item, wrench);
+                let (uv_key, _) = self.add_or_get_image(&uv_path, None, item, wrench, opaque);
 
                 YuvData::NV12(y_key, uv_key)
             }
             "interleaved" => {
                 let yuv_path = rsrc_path(&item["src"], &self.aux_dir);
-                let (yuv_key, _) = self.add_or_get_image(&yuv_path, None, item, wrench);
+                let (yuv_key, _) = self.add_or_get_image(&yuv_path, None, item, wrench, opaque);
 
                 YuvData::InterleavedYCbCr(yuv_key)
             }
@@ -1435,9 +1447,10 @@ impl YamlFrameReader {
                                  "src"
                              }];
         let tiling = item["tile-size"].as_i64();
+        let is_opaque = item["opaque"].as_bool();
         let file = rsrc_path(filename, &self.aux_dir);
         let (image_key, image_dims) =
-            self.add_or_get_image(&file, tiling, item, wrench);
+            self.add_or_get_image(&file, tiling, item, wrench, is_opaque);
 
         let bounds_raws = item["bounds"].as_vec_f32().unwrap();
         let bounds = if bounds_raws.len() == 2 {
@@ -1741,6 +1754,13 @@ impl YamlFrameReader {
                     flags.insert(PrimitiveFlags::PREFER_COMPOSITOR_SURFACE);
                 } else {
                     flags.remove(PrimitiveFlags::PREFER_COMPOSITOR_SURFACE);
+                }
+            }
+            if let Some(force_opaque) = item["force-opacity"].as_bool() {
+                if force_opaque {
+                    flags.insert(PrimitiveFlags::FORCE_OPACITY);
+                } else {
+                    flags.remove(PrimitiveFlags::FORCE_OPACITY);
                 }
             }
 

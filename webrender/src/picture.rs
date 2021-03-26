@@ -4604,7 +4604,7 @@ impl PicturePrimitive {
             prev_precise_local_rect: LayoutRect::zero(),
             options,
             segments_are_valid: false,
-            is_opaque: false,
+            is_opaque: flags.contains(PrimitiveFlags::FORCE_OPACITY),
         }
     }
 

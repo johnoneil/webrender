@@ -1470,7 +1470,12 @@ impl BatchBuilder {
             }
             PrimitiveInstanceKind::Picture { pic_index, segment_instance_index, .. } => {
                 let picture = &ctx.prim_store.pictures[pic_index.0];
-                let non_segmented_blend_mode = BlendMode::PremultipliedAlpha;
+                // JONEIL: We can alleviate issues with losing image opacity
+                // by using the non-allpha (BlendMode::None) pass.
+                let non_segmented_blend_mode = match picture.is_opaque {
+                    true => BlendMode::None,
+                    false => BlendMode::PremultipliedAlpha,
+                };
                 let prim_cache_address = gpu_cache.get_address(&ctx.globals.default_image_handle);
 
                 let prim_header = PrimitiveHeader {
